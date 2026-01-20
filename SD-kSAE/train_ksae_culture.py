@@ -232,7 +232,7 @@ if __name__ == "__main__":
     save_features(
         k_sparse_autoencoder,
         activation_store,
-        number_of_images = 24790,
-        number_of_max_activating_images = 20,
+        number_of_images = number_of_images,
+        number_of_max_activating_images = 10,
     )
 
