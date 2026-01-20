@@ -220,6 +220,8 @@ if __name__ == "__main__":
         device=device,
     )
 
+    # HI
+
     model = HookedStableDiffusion(cfg.model_name, cfg.image_size, cfg.device)   # load model
     model.eval()
     image_paths = collect_culturebench_images(
