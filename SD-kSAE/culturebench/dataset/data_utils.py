@@ -334,8 +334,8 @@ def load_image_collection(json_path: str) -> ImageItemCollection:
 
 
 def load_culturebench_json(
-    data_json_path: str = "SD-kSAE/culturebench/dataset/culturebench.json",
-    prompts_json_path: str = "SD-kSAE/culturebench/dataset/culturebench_prompts.json",
+    data_json_path: str = "SD-kSAE/culturebench/data/culturebench.json",
+    prompts_json_path: str = "SD-kSAE/culturebench/data/culturebench_prompts.json",
 ) -> Dict:
     """
     Load culturebench data from JSON file.

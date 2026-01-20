@@ -46,9 +46,9 @@ from culturebench.dataset.data_utils import get_activities, get_countries, get_s
 
 
 class CultureDataset(Dataset):
-    def __init__(self, dataset, image_key: str, image_size: int):
-        self.dataset = dataset
-        self.image_key = image_key
+    def __init__(self, image_paths: List[Path], image_size: int):
+        self.image_paths = image_paths
+        self.image_size = image_size
         self.preprocess = transforms.Compose(
             [transforms.Resize(image_size),
             # transforms.CenterCrop(image_size),
@@ -56,11 +56,12 @@ class CultureDataset(Dataset):
             transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])]
         )
     def __len__(self):
-        return len(self.dataset)
+        return len(self.image_paths)
 
     def __getitem__(self, idx):
         # Load the image from the dataset
-        raw_image = self.dataset[idx][self.image_key].convert("RGB")
+        raw_image = Image.open(self.image_paths[idx]).convert("RGB")
+        
         
         # Preprocess the image into a tensor
         processed_image = self.preprocess(raw_image)
