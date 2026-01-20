@@ -1,5 +1,6 @@
 import json
 import os
+from PIL import Image
 import torch
 from datasets import load_dataset
 from torch import topk
@@ -14,11 +15,17 @@ def get_sae_activations(model_activaitons, k_sparse_autoencoder):
     return sae_activations
 
         
-def save_highest_activating_images_high(max_activating_image_indices, max_activating_image_values, directory, dataset, image_key, sae_mean_acts, sae_sparsity, max_activating_image_label_indices):
+def save_highest_activating_images_high(
+    max_activating_image_indices,
+    max_activating_image_values,
+    directory, dataset,
+    image_key, sae_mean_acts,
+    sae_sparsity,
+    max_activating_image_label_indices, neurons):
     assert max_activating_image_values.size() == max_activating_image_indices.size(), "size of max activating image indices doesn't match the size of max activing values."
     number_of_neurons, number_of_max_activating_examples = max_activating_image_values.size()
 
-    num_activating = sae_sparsity * len(dataset)
+    # num_activating = sae_sparsity * len(dataset)
     # _, neurons = topk(sae_mean_acts * (num_activating > 10), k=100)
     
     for neuron in tqdm(neurons, desc = "saving highest activating images"):
@@ -37,10 +44,25 @@ def get_new_top_k(first_values, first_indices, second_values, second_indices, k)
     total_indices = torch.cat([first_indices, second_indices], dim = 1)
     new_values, indices_of_indices = topk(total_values, k=k, dim=1)
     new_indices = torch.gather(total_indices, 1, indices_of_indices)
-    return new_values, new_indices
+    return new_values, new_indices# NEW: simple dataset for CultureBench local images (used only in analysis)
+
+
+class CultureBenchImageDataset:
+    def __init__(self, image_paths):
+        self.image_paths = image_paths
+
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, idx):
+        path = self.image_paths[idx]
+        img = Image.open(path).convert("RGB")
+        # We don’t currently have numeric labels; use 0 as dummy label.
+        return {"image": img, "label": 0}
+
 
 @torch.inference_mode()
-def safe_features(
+def save_features(
     k_sparse_autoencoder: KSparseAutoencoder,
     activation_store: SDActivationsStore,
     number_of_images: int = 32_768,
@@ -50,13 +72,28 @@ def safe_features(
 
     torch.cuda.empty_cache()
     k_sparse_autoencoder.eval()
-    
-    dataset = load_dataset(k_sparse_autoencoder.cfg.dataset_name, split="train")
 
-    if k_sparse_autoencoder.cfg.dataset_name=="cifar100": # Need to put this in the cfg
-        image_key = 'img'
-    else:
+    if k_sparse_autoencoder.cfg.dataset_name == "culturebench":
+        # Read image paths saved during feature extraction
+        activations_dir = k_sparse_autoencoder.cfg.model_name
+        image_paths_file = os.path.join(activations_dir, "image_paths.txt")
+        if not os.path.exists(image_paths_file):
+            raise FileNotFoundError(
+                f"Expected image_paths.txt in {activations_dir} (did you run extract_features_culture.py with Step 1 changes?)."
+            )
+        with open(image_paths_file, "r") as f:
+            image_paths = [line.strip() for line in f if line.strip()]
+        dataset = CultureBenchImageDataset(image_paths)
         image_key = 'image'
+    else:
+        # Original HF dataset path
+        dataset = load_dataset(k_sparse_autoencoder.cfg.dataset_name, split="train")
+        if k_sparse_autoencoder.cfg.dataset_name == "cifar100":  # Need to put this in the cfg
+            image_key = 'img'
+        else:
+            image_key = 'image'
+
+
         
     directory = k_sparse_autoencoder.cfg.feature_dir
     if load_pretrained:
@@ -108,4 +145,4 @@ def safe_features(
         with open(f'{directory}/average_stds.json', 'w') as f:
             json.dump(average_stds, f)
             
-    save_highest_activating_images_high(max_activating_image_indices[:,:10], max_activating_image_values[:,:10], directory, dataset, image_key, sae_mean_acts, sae_sparsity, max_activating_image_label_indices)
+    save_highest_activating_images_high(max_activating_image_indices[:,:10], max_activating_image_values[:,:10], directory, dataset, image_key, sae_mean_acts, sae_sparsity, max_activating_image_label_indices, neurons)

@@ -225,6 +225,10 @@ if __name__ == "__main__":
 
     k_sparse_autoencoder.eval()
     activation_store = SDActivationsStore(cfg)
+    if cfg.dataset_name == "culturebench":
+        number_of_images = 4640
+    else:
+        number_of_images = 24790
     save_features(
         k_sparse_autoencoder,
         activation_store,
