@@ -61,7 +61,7 @@ class CultureDataset(Dataset):
     def __getitem__(self, idx):
         # Load the image from the dataset
         raw_image = Image.open(self.image_paths[idx]).convert("RGB")
-        
+
         
         # Preprocess the image into a tensor
         processed_image = self.preprocess(raw_image)
@@ -233,9 +233,15 @@ if __name__ == "__main__":
         countries=None,
         max_images_per_category=None,
     )
+    print("NUM IMAGES:", len(image_paths))
     if len(image_paths) == 0:
         logging.error("No image paths found")
         exit(1)
         exit(1)
     logging.info(f"Collected {len(image_paths)} image paths from CultureBench")
+    os.makedirs(cfg.save_path, exist_ok=True)
+    image_paths_file = os.path.join(cfg.save_path, "image_paths.txt")
+    with open(image_paths_file, "w") as f:
+        for p in image_paths:
+            f.write(str(p) + "\n")
     process_batches(model, image_paths, cfg)
