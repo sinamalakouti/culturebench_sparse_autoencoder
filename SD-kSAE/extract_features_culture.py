@@ -189,7 +189,7 @@ def parse_arguments():
     parser.add_argument("--image_key", type=str, default="image")
     parser.add_argument("--max_batch_size", type=int, default=32, help="Maximum batch size to save.")
     parser.add_argument("--save_path", type=str, default=None, help="Path to save extracted features. If not specified, it will be generated automatically.")
-    parser.add_argument("--T2I", type=str, default="gt_images", help="Text-to-image model to use. Options: 'gt_images', 'stable-diffusion-3.5-medium'")
+    parser.add_argument("--T2I", type=str, default="stable-diffusion-3.5-medium", help="Text-to-image model to use. Options: 'gt_images', 'stable-diffusion-3.5-medium'")
     parser.add_argument("--gen_mode", type=str, default="country", help="Generation mode. Options: 'base', 'countryInPrompt'")
     parser.add_argument("--desc_mode", type=str, default="country", help="Descriptor mode. Options: 'base', 'country'")
 

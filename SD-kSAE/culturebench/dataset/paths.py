@@ -10,7 +10,7 @@ culturebench_root = Path("/u/sem238/datasets/culturebench/")
 culturebench_root = culturebench_root / benchmark_version
 google_image_root = Path(
     # "/Users/sinamalakouti/Desktop/cultural_data/culturebench/groundtruth/culturebench_google/"
-    "/u/sem238/datasets/culturebench/groundtruth/culturebench_googledddddd"
+    "/u/sem238/datasets/culturebench/groundtruth/culturebench_google"
 )
 descriptor_paths = (
     Path(culturebench_root)
