@@ -170,7 +170,7 @@ def parse_args():
     parser.add_argument('--lr_scheduler_name', type=str, default='constantwithwarmup', help="Learning rate scheduler name")
     parser.add_argument('--batch_size', type=int, default=8192, help="Batch size")
     parser.add_argument('--lr_warm_up_steps', type=int, default=500, help="Number of warm-up steps")
-    parser.add_argument('--total_training_tokens', type=int, default=83886080, help="Total training tokens")
+    parser.add_argument('--total_training_tokens', type=int, default=20000000, help="Total training tokens")
     parser.add_argument('--dead_feature_threshold', type=float, default=1e-6, help="Dead feature threshold")
 
     # WANDB
